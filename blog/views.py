@@ -59,15 +59,13 @@ def post_create(request):
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
-            post.author = request.user
+            post.author = request.user  # Automatically set the author
             post.save()
             return redirect('post_detail', pk=post.pk)
     else:
         form = PostForm()
     return render(request, 'blog/post_form.html', {'form': form})
 
-
-    
 @login_required
 def post_edit(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -80,7 +78,6 @@ def post_edit(request, pk):
         form = PostForm(instance=post)
     return render(request, 'blog/post_edit.html', {'form': form, 'post': post})
 
-    
 @login_required
 def post_delete(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -92,15 +89,13 @@ def post_delete(request, pk):
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
 
-
-
     # Handle the comment form submission
     if request.method == "POST":
         if request.user.is_authenticated:
             comment_form = CommentForm(request.POST)
             if comment_form.is_valid():
                 comment = comment_form.save(commit=False)
-                comment.author = request.user
+                comment.author = request.user  # Set the author as the logged-in user
                 comment.post = post
                 comment.save()
                 return redirect('post_detail', pk=post.pk)
@@ -117,7 +112,6 @@ def post_detail(request, pk):
         'comments': comments,
         'comment_form': comment_form
     })
-
 
 # -------------------- PROFILE --------------------
 @login_required
@@ -184,11 +178,9 @@ def comment_edit(request, pk):
 
     return render(request, 'blog/comment_form.html', {'form': form, 'comment': comment})
 
-
 @login_required
 def comment_delete(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
-    # if comment.author != request.user:
     if request.user != comment.author:
         return HttpResponseForbidden("You are not allowed to delete this comment.")
     if request.method == 'POST':
@@ -213,6 +205,7 @@ class PostListCreate(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
+        # Automatically set the author to the logged-in user
         serializer.save(author=self.request.user)
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -230,6 +223,7 @@ class CommentListCreate(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         post = get_object_or_404(Post, pk=self.kwargs['post_pk'])
+        # Automatically set the author of the comment to the logged-in user
         serializer.save(post=post, author=self.request.user)
 
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):

@@ -9,9 +9,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-s41l919tu$su6l^l)ffpp94u)co-ymxo%09b3&=%2_pv714-^x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['tanisha22.pythonanywhere.com']
+ALLOWED_HOSTS = ['tanisha22.pythonanywhere.com', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -24,8 +26,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blog',
     'rest_framework',
-]
+    'rest_framework.authtoken',
 
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -100,9 +103,12 @@ USE_TZ = True
 
 # Static files configuration
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles')]
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
+# Additional directories where static files are stored during development (e.g., for apps)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # This is where you put your app's static files
+]
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -123,3 +129,19 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your-email@gmail.com'  # Replace with your email
 EMAIL_HOST_PASSWORD = 'your-email-password'  # Replace with your email password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+
+
+
+
+
+
+# Generated token 65b1bb926063a0321f81876f2c967bc8407c8ef3 for user blog
