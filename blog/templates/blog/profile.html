@@ -1,0 +1,65 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+    <div class="profile-container">
+        <h1>User Profile</h1>
+
+        <!-- Display Success or Error Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- If editing is False, show profile details -->
+        {% if not editing %}
+            <div class="profile-details">
+                <p><strong>First Name:</strong> {{ profile.first_name }}</p>
+                <p><strong>Last Name:</strong> {{ profile.last_name }}</p>
+                <p><strong>Email:</strong> {{ profile.email }}</p>
+
+                <p><strong>Profile Picture:</strong></p>
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <p>No profile picture uploaded.</p>
+                {% endif %}
+            </div>
+
+            <!-- Edit Profile and Logout Button Section -->
+            <div class="profile-actions">
+                <a href="?edit=true" class="btn btn-primary">Edit Profile</a>
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Logout</button>
+                </form>
+            </div>
+        {% else %}
+            <!-- If editing is True, show the profile edit form -->
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_first_name">First Name</label>
+                    {{ form.first_name }}
+                </div>
+                <div class="form-group">
+                    <label for="id_last_name">Last Name</label>
+                    {{ form.last_name }}
+                </div>
+                <div class="form-group">
+                    <label for="id_email">Email</label>
+                    {{ form.email }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_profile_picture">Profile Picture</label>
+                    {{ form.profile_picture }}
+                </div>
+
+                <button type="submit" class="btn btn-success">Save Profile</button>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

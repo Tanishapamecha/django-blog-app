@@ -1,0 +1,37 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card mx-auto shadow-lg" style="max-width: 600px;">
+        <div class="card-header text-center bg-primary text-white">
+            <h4>{{ user.username }}'s Profile</h4>
+        </div>
+        <div class="card-body text-center">
+            <!-- Profile Picture -->
+            {% if user.profile.profile_picture %}
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+            {% else %}
+                <img src="{% static 'default-user.png' %}" alt="Default Pic" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+            {% endif %}
+
+            <!-- User Details -->
+            <div class="profile-details">
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                {% if user.profile.first_name %}
+                    <p><strong>First Name:</strong> {{ user.profile.first_name }}</p>
+                {% endif %}
+                {% if user.profile.last_name %}
+                    <p><strong>Last Name:</strong> {{ user.profile.last_name }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Edit Profile Button -->
+            <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary btn-sm mt-2">Edit Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

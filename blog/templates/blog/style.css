@@ -1,0 +1,110 @@
+/* base.css */
+
+/* Post card styling */
+.post-card {
+    background-color: #f8f9fa;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.post-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Title styling */
+.post-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #343a40; /* Changed color to dark gray */
+    margin-bottom: 10px;
+    transition: color 0.3s ease;
+}
+
+.post-title:hover {
+    color: #000000; /* Changed hover color to black */
+    text-decoration: underline;
+}
+
+/* Excerpt and meta styling */
+.post-excerpt {
+    font-size: 1rem;
+    color: #495057; /* Changed color to light gray */
+    line-height: 1.6;
+    margin-bottom: 15px;
+    text-align: left; /* Ensures the text is left-aligned */
+}
+
+.post-meta {
+    font-size: 0.875rem;
+    color: #6c757d; /* Changed to muted gray */
+    margin-bottom: 15px;
+    text-align: left; /* Left-aligns the meta information */
+}
+
+/* Button styling */
+.post-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.btn-outline-primary {
+    border-color: #000000; /* Changed button border to black */
+    color: #000000; /* Changed button text to black */
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: #000000; /* Changed button hover background to black */
+    color: white;
+    border-color: #000000; /* Changed border on hover to black */
+}
+
+/* Pagination styling */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination .step-links a {
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin: 0 5px;
+    border: 2px solid #000000; /* Changed pagination border to black */
+    color: #000000; /* Changed pagination text to black */
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.pagination .step-links .current {
+    padding: 12px 20px;
+    font-size: 1rem;
+    background-color: #000000; /* Changed current pagination background to black */
+    color: white;
+    border-radius: 5px;
+}
+
+.pagination .step-links a:hover {
+    background-color: #000000; /* Changed hover background to black */
+    color: white;
+}
+
+.pagination .step-links a:active {
+    background-color: #333; /* Darkened active state */
+}
+
+.step-links a {
+    display: inline-block;
+}
+
+/* Media query for responsive layout */
+@media (max-width: 768px) {
+    .post-card {
+        margin: 0 auto;
+    }
+}

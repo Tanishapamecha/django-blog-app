@@ -1,0 +1,72 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<style>
+    .login-form {
+        background: #ffffff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        margin: 60px auto;
+    }
+
+    .login-form h2 {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .login-form input[type="text"],
+    .login-form input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .login-form button {
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        border: none;
+        color: white;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .login-form button:hover {
+        background-color: #0056b3;
+    }
+
+    .login-form p {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .login-form a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .login-form a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="login-form">
+    <h2>Login</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+    <p><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
+    <p>Don’t have an account? <a href="{% url 'register' %}">Register here</a></p>
+</div>
+
+{% endblock %}

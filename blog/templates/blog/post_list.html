@@ -1,0 +1,50 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>All Blog Posts</h1>
+
+    {% for post in posts %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h3 class="card-title">{{ post.title }}</h3>
+                <p class="card-text">
+                    <small class="text-muted">By {{ post.author.username }} on {{ post.created_at|date:"d M Y H:i" }}</small>
+                </p>
+                
+                <!-- Edit and Delete Buttons (visible only if the logged-in user is the author of the post) -->
+                {% if user == post.author %}
+                <div class="d-flex justify-content-between mt-2">
+                    <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
+                    <form method="post" action="{% url 'post_delete' post.pk %}" onsubmit="return confirm('Are you sure you want to delete this post?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+                {% endif %}
+
+                <a class="btn btn-primary mt-2" href="{% url 'post_detail' post.id %}">View Post</a>
+            </div>
+        </div>
+    {% empty %}
+        <p>No posts available.</p>
+    {% endfor %}
+
+    <!-- Pagination Links -->
+    <div class="pagination mt-4 text-center">
+        <span class="step-links">
+            {% if posts.has_previous %}
+                <a href="?page=1" class="btn btn-secondary">&laquo; First</a>
+                <a href="?page={{ posts.previous_page_number }}" class="btn btn-secondary">Previous</a>
+            {% endif %}
+            <span class="current">
+                Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+            </span>
+            {% if posts.has_next %}
+                <a href="?page={{ posts.next_page_number }}" class="btn btn-secondary">Next</a>
+                <a href="?page={{ posts.paginator.num_pages }}" class="btn btn-secondary">Last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}

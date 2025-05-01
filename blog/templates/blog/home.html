@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Home</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .navbar { background-color: #000000; padding: 10px; } /* Changed navbar background to black */
+        .navbar a { color: white; margin-right: 15px; text-decoration: none; } /* Changed text color to white */
+        .post { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+        .post h2 { margin: 0; }
+        .post small { color: gray; }
+        a.btn { text-decoration: none; background-color: #000000; color: white; padding: 5px 10px; border-radius: 3px; } /* Changed button background to black */
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <a href="{% url 'home' %}">Blog</a>
+        <a href="{% url 'post_create' %}">Create New Post</a>
+        <a href="{% url 'profile' %}">Profile</a>
+    </div>
+
+    <h1>All Blog Posts</h1>
+    
+    {% for post in posts %}
+        <div class="post">
+            <h2>{{ post.title }}</h2>
+            <small>By {{ post.author.username }} on {{ post.created_at|date:"d M Y H:i" }}</small>
+            <br><br>
+            <a class="btn" href="{% url 'post_detail' post.id %}">View Post</a>
+        </div>
+    {% empty %}
+        <p>No posts available.</p>
+    {% endfor %}
+</body>
+</html>
