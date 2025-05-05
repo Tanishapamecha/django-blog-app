@@ -2,7 +2,19 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>All Blog Posts</h1>
+    <h1 class="mb-4">All Blog Posts</h1>
+
+    <!-- Search Form -->
+    <form method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Search posts..." value="{{ query }}">
+            <button type="submit" class="btn btn-outline-secondary">Search</button>
+            <button type="reset" class="btn btn-outline-secondary">Clear</button>
+
+        </div>
+    </form>
+
+    <p><strong>Total Posts:</strong> {{ page_obj.paginator.count }}</p>
 
     {% for post in posts %}
         <div class="card mb-3">
@@ -11,8 +23,7 @@
                 <p class="card-text">
                     <small class="text-muted">By {{ post.author.username }} on {{ post.created_at|date:"d M Y H:i" }}</small>
                 </p>
-                
-                <!-- Edit and Delete Buttons (visible only if the logged-in user is the author of the post) -->
+
                 {% if user == post.author %}
                 <div class="d-flex justify-content-between mt-2">
                     <a href="{% url 'post_edit' post.pk %}" class="btn btn-outline-primary btn-sm">Edit</a>
@@ -23,28 +34,50 @@
                 </div>
                 {% endif %}
 
-                <a class="btn btn-primary mt-2" href="{% url 'post_detail' post.id %}">View Post</a>
+                <a class="btn btn-primary mt-2" href="{% url 'post_detail' post.pk %}">View Post</a>
             </div>
         </div>
     {% empty %}
         <p>No posts available.</p>
     {% endfor %}
 
-    <!-- Pagination Links -->
-    <div class="pagination mt-4 text-center">
-        <span class="step-links">
-            {% if posts.has_previous %}
-                <a href="?page=1" class="btn btn-secondary">&laquo; First</a>
-                <a href="?page={{ posts.previous_page_number }}" class="btn btn-secondary">Previous</a>
+    <!-- Bootstrap Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
             {% endif %}
-            <span class="current">
-                Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
-            </span>
-            {% if posts.has_next %}
-                <a href="?page={{ posts.next_page_number }}" class="btn btn-secondary">Next</a>
-                <a href="?page={{ posts.paginator.num_pages }}" class="btn btn-secondary">Last &raquo;</a>
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
             {% endif %}
-        </span>
-    </div>
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 {% endblock %}

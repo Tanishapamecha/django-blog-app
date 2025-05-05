@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import HttpResponseForbidden
 from django.contrib import messages
+from django.db.models import Q
+
 
 from .models import Post, Comment, Profile
 from .forms import PostForm, CommentForm, ProfileForm, UserProfileForm
@@ -47,11 +49,63 @@ def home(request):
     posts = Post.objects.all()
     return render(request, 'blog/home.html', {'posts': posts})
 
+# @login_required
+# def post_list(request):
+#     posts = Post.objects.all().order_by('-created_at')
+#     paginator = Paginator(posts, 5)  # 5 posts per page
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+#     comment_forms = {post.id: CommentForm() for post in posts}
+#     return render(request, 'blog/post_list.html', {'posts': posts, 'comment_forms': comment_forms})
+
+
+
+# @login_required
+# def post_list(request):
+#     all_posts = Post.objects.all().order_by('-created_at')
+#     paginator = Paginator(all_posts, 5)  # 5 posts per page
+#     page_number = request.GET.get('page')
+#     page_obj = paginator.get_page(page_number)
+    
+#     # Keep using 'posts' in the template
+#     posts = page_obj.object_list
+#     comment_forms = {post.id: CommentForm() for post in posts}
+
+#     return render(request, 'blog/post_list.html', {
+#         'posts': posts,            
+#         'page_obj': page_obj,      
+#         'comment_forms': comment_forms
+#     })
+
 @login_required
 def post_list(request):
-    posts = Post.objects.all().order_by('-created_at')
+    query = request.GET.get('q', '')  # Get the search query from GET parameters
+
+    # If a query exists, filter posts by title or content
+    all_posts = Post.objects.all().order_by('-created_at')  # Get all posts ordered by creation date
+
+    if query:
+        # Filter posts by title or content if a query is provided
+        all_posts = all_posts.filter(
+            Q(title__icontains=query) | Q(content__icontains=query)
+        )
+
+    paginator = Paginator(all_posts, 5)  # 5 posts per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Keep using 'posts' in the template
+    posts = page_obj.object_list
     comment_forms = {post.id: CommentForm() for post in posts}
-    return render(request, 'blog/post_list.html', {'posts': posts, 'comment_forms': comment_forms})
+
+    return render(request, 'blog/post_list.html', {
+        'posts': posts,
+        'page_obj': page_obj,
+        'comment_forms': comment_forms,
+        'query': query,  # Pass the search query to the template for persistence
+    })
+
+
 
 @login_required
 def post_create(request):
