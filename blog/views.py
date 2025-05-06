@@ -8,12 +8,12 @@ from django.http import HttpResponseForbidden
 from django.contrib import messages
 from django.db.models import Q
 
-
+# Models & Forms
 from .models import Post, Comment, Profile
-from .forms import PostForm, CommentForm, ProfileForm, UserProfileForm
+from .forms import PostForm, CommentForm, ProfileForm
 
 # DRF Imports
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from .serializers import PostSerializer, CommentSerializer
 from .permissions import IsAuthorOrReadOnly
@@ -45,67 +45,32 @@ def custom_logout(request):
     return redirect('home')
 
 # -------------------- HOME & POSTS --------------------
+@login_required
 def home(request):
     posts = Post.objects.all()
     return render(request, 'blog/home.html', {'posts': posts})
 
-# @login_required
-# def post_list(request):
-#     posts = Post.objects.all().order_by('-created_at')
-#     paginator = Paginator(posts, 5)  # 5 posts per page
-#     page_number = request.GET.get('page')
-#     page_obj = paginator.get_page(page_number)
-#     comment_forms = {post.id: CommentForm() for post in posts}
-#     return render(request, 'blog/post_list.html', {'posts': posts, 'comment_forms': comment_forms})
-
-
-
-# @login_required
-# def post_list(request):
-#     all_posts = Post.objects.all().order_by('-created_at')
-#     paginator = Paginator(all_posts, 5)  # 5 posts per page
-#     page_number = request.GET.get('page')
-#     page_obj = paginator.get_page(page_number)
-    
-#     # Keep using 'posts' in the template
-#     posts = page_obj.object_list
-#     comment_forms = {post.id: CommentForm() for post in posts}
-
-#     return render(request, 'blog/post_list.html', {
-#         'posts': posts,            
-#         'page_obj': page_obj,      
-#         'comment_forms': comment_forms
-#     })
-
 @login_required
 def post_list(request):
-    query = request.GET.get('q', '')  # Get the search query from GET parameters
-
-    # If a query exists, filter posts by title or content
-    all_posts = Post.objects.all().order_by('-created_at')  # Get all posts ordered by creation date
+    query = request.GET.get('q', '')
+    all_posts = Post.objects.all().order_by('-created_at')
 
     if query:
-        # Filter posts by title or content if a query is provided
         all_posts = all_posts.filter(
             Q(title__icontains=query) | Q(content__icontains=query)
         )
 
-    paginator = Paginator(all_posts, 5)  # 5 posts per page
+    paginator = Paginator(all_posts, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
-    # Keep using 'posts' in the template
-    posts = page_obj.object_list
-    comment_forms = {post.id: CommentForm() for post in posts}
+    comment_forms = {post.id: CommentForm() for post in page_obj.object_list}
 
     return render(request, 'blog/post_list.html', {
-        'posts': posts,
+        'posts': page_obj.object_list,
         'page_obj': page_obj,
         'comment_forms': comment_forms,
-        'query': query,  # Pass the search query to the template for persistence
+        'query': query,
     })
-
-
 
 @login_required
 def post_create(request):
@@ -113,7 +78,7 @@ def post_create(request):
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
-            post.author = request.user  # Automatically set the author
+            post.author = request.user
             post.save()
             return redirect('post_detail', pk=post.pk)
     else:
@@ -140,27 +105,24 @@ def post_delete(request, pk):
         return redirect('post_list')
     return render(request, 'blog/post_delete.html', {'post': post})
 
+@login_required
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
-
-    # Handle the comment form submission
     if request.method == "POST":
         if request.user.is_authenticated:
             comment_form = CommentForm(request.POST)
             if comment_form.is_valid():
                 comment = comment_form.save(commit=False)
-                comment.author = request.user  # Set the author as the logged-in user
+                comment.author = request.user
                 comment.post = post
                 comment.save()
                 return redirect('post_detail', pk=post.pk)
         else:
-            return redirect('login')  # Redirect to login if user is not authenticated
+            return redirect('login')
     else:
         comment_form = CommentForm()
 
-    # Fetch all comments for the post
     comments = post.comments.all()
-
     return render(request, 'blog/post_detail.html', {
         'post': post,
         'comments': comments,
@@ -259,7 +221,6 @@ class PostListCreate(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Automatically set the author to the logged-in user
         serializer.save(author=self.request.user)
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -277,10 +238,22 @@ class CommentListCreate(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         post = get_object_or_404(Post, pk=self.kwargs['post_pk'])
-        # Automatically set the author of the comment to the logged-in user
         serializer.save(post=post, author=self.request.user)
 
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsAuthorOrReadOnly]
+
+# Comment ViewSet
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        post = get_object_or_404(Post, pk=self.kwargs['post_pk'])
+        return post.comments.all()
+
+    def perform_create(self, serializer):
+        post = get_object_or_404(Post, pk=self.kwargs['post_pk'])
+        serializer.save(post=post, author=self.request.user)

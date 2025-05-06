@@ -12,13 +12,8 @@ urlpatterns = [
     # --- Main Views ---
     path('', views.post_list, name='post_list'),
     path('home/', views.home, name='home'),
-    #path('post/<int:pk>/', views.PostDetail.as_view(), name='post_detail'),
     path('post/<int:pk>/', views.post_detail, name='post_detail'),  # frontend view
     path('post/<int:pk>/like/', views.post_like, name='post_like'),
-
-    path('post/<int:id>/', views.post_detail, name='post_detail'),
-
-
     path('create/', views.post_create, name='post_create'),
     path('post/<int:pk>/edit/', views.post_edit, name='post_edit'),
     path('post/<int:pk>/delete/', views.post_delete, name='post_delete'),
@@ -39,9 +34,20 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
-    # --- API ---
+    # --- API --- 
     path('api/posts/', views.PostListCreate.as_view(), name='api_post_list_create'),
     path('api/posts/<int:pk>/', views.PostDetail.as_view(), name='api_post_detail'),
     path('api/posts/<int:post_pk>/comments/', views.CommentListCreate.as_view(), name='api_comment_list_create'),
     path('api/comments/<int:pk>/', views.CommentDetail.as_view(), name='api_comment_detail'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+
+# {
+#     "id": 71,
+#     "content": "This is my test comment from Postman..",
+#     "created_at": "2025-05-06T09:59:19.825894Z",
+#     "author": 1,
+#     "post": 55,
+#     "updated_at": "2025-05-06T09:59:19.825929Z"
+# } #created through comment

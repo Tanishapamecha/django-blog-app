@@ -29,6 +29,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
 ]
+
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -145,3 +148,5 @@ REST_FRAMEWORK = {
 
 
 # Generated token 65b1bb926063a0321f81876f2c967bc8407c8ef3 for user blog
+
+# python manage.py drf_create_token blog
